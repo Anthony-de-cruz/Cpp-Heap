@@ -18,13 +18,27 @@ Heap::Heap() {
         throw std::runtime_error("Memory map retrival failed");
     }
 
-    // this->head = new Chunk(map, page_size);
-    this->head = std::shared_ptr<Chunk>(new Chunk(map, page_size));
+    ChunkData *head = (ChunkData *)map;
+    head->size = page_size;
+    head->in_use = false;
+    head->next = head;
+    head->prev = head;
+
+    this->head = head;
 }
+
+void *Heap::alloc(uint32_t size) {
+    this->head->in_use = true;
+    return this->head + sizeof(ChunkData);
+}
+
+void coalesce_chunk();
+
+void truncate_chunk();
 
 void Heap::free_heap() {
     // System call to free the mapped memory
-    int status = munmap((void *)this->head->get_memory_ptr(), getpagesize());
+    int status = munmap((void *)this->head, getpagesize());
     if (status) {
         throw std::runtime_error("Memory map free failed");
     }

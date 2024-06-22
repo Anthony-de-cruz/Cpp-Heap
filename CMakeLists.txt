@@ -13,6 +13,5 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(Cpp-Heap 
     example/basic_example.cpp
-    src/chunk.cpp
     src/heap.cpp
 )
