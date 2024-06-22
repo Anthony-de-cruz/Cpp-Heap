@@ -1,9 +1,10 @@
 #include <cstdlib>
-#include <iostream>
+
+#include "heap.h"
 
 int main() {
 
-    std::cout << "Hi" << '\n';
+    Heap heap = Heap();
 
     return EXIT_SUCCESS;
 }
