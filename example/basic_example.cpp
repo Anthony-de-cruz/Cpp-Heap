@@ -14,11 +14,6 @@ int main() {
         std::cerr << exception.what() << '\n';
     }
 
-    // try {
-    //     heap.free_heap();
-    // } catch (std::runtime_error &exception) {
-    //     std::cerr << exception.what() << '\n';
-    // }
     delete heap;
 
     return EXIT_SUCCESS;
