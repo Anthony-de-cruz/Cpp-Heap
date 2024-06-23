@@ -2,6 +2,7 @@
 #define HEAP_H
 
 #include <cstdint>
+#include <ostream>
 
 class Heap {
 
@@ -9,19 +10,22 @@ class Heap {
     typedef struct ChunkData {
         std::uint32_t size;
         bool in_use;
-        void *next;
-        void *prev;
+        ChunkData *next;
+        ChunkData *prev;
     } ChunkData;
 
     ChunkData *head;
     std::uint32_t available_space;
+
+    void free_heap();
 
   public:
     Heap();
     void *alloc(std::uint32_t size);
     void *realloc(void *chunk, std::uint32_t new_size);
     void free(void *chunk);
-    void free_heap();
+    void print_chunk(std::ostream &stream, void *chunk);
+    void print_heap(std::ostream &stream);
     ~Heap();
 };
 

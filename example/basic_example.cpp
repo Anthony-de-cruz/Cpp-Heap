@@ -20,6 +20,10 @@ int main() {
 
     std::cout << string1;
 
+    heap->print_heap(std::cout);
+
+    heap->free(string1);
+
     delete heap;
 
     return EXIT_SUCCESS;
