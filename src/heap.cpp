@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <iomanip>
 #include <ios>
 #include <iostream>
@@ -50,6 +51,9 @@ void coalesce_chunk();
 
 void truncate_chunk();
 
+/**
+ * Todo: unspaghettify
+ */
 void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
     ChunkData *chunk_data = (ChunkData *)chunk_ptr - sizeof(ChunkData);
 
@@ -59,25 +63,31 @@ void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
            << "    next chunk @ " << chunk_data->next << '\n'
            << "    prev chunk @ " << chunk_data->prev << '\n';
 
-    unsigned int row_len = sizeof(ChunkData);
-
     // Print hex table
+    const int row_len = sizeof(ChunkData);
+    int byte_index = 0;
+
     for (int col = 0; col < (row_len * 3) + 6; col++) {
         stream << '-';
     }
     stream << '\n';
-    for (std::uint32_t row = 0; row < std::ceil(chunk_data->size / row_len);
-         row++) {
+    // number of rows are rounded up
+    for (std::uint32_t row = 0;
+         row < (chunk_data->size + (row_len - 1)) / row_len; row++) {
         stream << std::setw(4) << std::setfill('0') << std::dec << row * row_len
                << "|  ";
 
         for (std::uint32_t col = 0; col < row_len; col++) {
+            byte_index++;
+            if (byte_index >= chunk_data->size) {
+                continue;
+            }
             // Pull out uint8 data at each address, cast to int and print as hex
             std::uint8_t *ptr = (std::uint8_t *)((std::uintptr_t)chunk_data +
                                                  (row * row_len) + col);
             int byte = *ptr;
             stream << std::setw(2) << std::setfill('0') << std::hex
-                   << std::uppercase << std::noskipws << byte << " ";
+                   << std::uppercase << std::noskipws << byte << ' ';
         }
         stream << '\n';
     }
