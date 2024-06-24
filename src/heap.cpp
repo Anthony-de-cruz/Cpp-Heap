@@ -32,7 +32,7 @@ Heap::Heap() {
 }
 
 void *Heap::alloc(uint32_t size) {
-    std::cout << "alloc @ " << this->head << '\n';
+    std::cout << "alloc @ " << this->head + sizeof(ChunkData) << '\n';
 
     this->head->in_use = true;
     this->head->size = this->head->size - sizeof(ChunkData);
@@ -51,50 +51,52 @@ void coalesce_chunk();
 
 void truncate_chunk();
 
-/**
- * Todo: unspaghettify
- */
-void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
-    ChunkData *chunk_data = (ChunkData *)chunk_ptr - sizeof(ChunkData);
-
-    stream << "chunk @ " << chunk_data << '\n'
-           << "    size: " << chunk_data->size << '\n'
-           << "    in use: " << chunk_data->in_use << '\n'
-           << "    next chunk @ " << chunk_data->next << '\n'
-           << "    prev chunk @ " << chunk_data->prev << '\n';
-
-    // Print hex table
-    const int row_len = sizeof(ChunkData);
+void print_hex_table(std::ostream &stream, void *memory_ptr,
+                     std::uint32_t bytes, unsigned int columns) {
+    const int rows = (bytes + (columns - 1)) / columns;
     int byte_index = 0;
 
-    for (int col = 0; col < (row_len * 3) + 6; col++) {
+    for (int col = 0; col < (columns * 3) + 16; col++) {
         stream << '-';
     }
     stream << '\n';
-    // number of rows are rounded up
-    for (std::uint32_t row = 0;
-         row < (chunk_data->size + (row_len - 1)) / row_len; row++) {
-        stream << std::setw(4) << std::setfill('0') << std::dec << row * row_len
-               << "|  ";
 
-        for (std::uint32_t col = 0; col < row_len; col++) {
-            byte_index++;
-            if (byte_index >= chunk_data->size) {
-                continue;
-            }
+    for (std::uint32_t row = 0; row < rows; row++) {
+        // Print the pointer for this row
+        stream << (void *)((ulong)memory_ptr + (byte_index)) << "|  ";
+
+        for (std::uint32_t col = 0; col < columns && byte_index < bytes;
+             col++, byte_index++) {
             // Pull out uint8 data at each address, cast to int and print as hex
-            std::uint8_t *ptr = (std::uint8_t *)((std::uintptr_t)chunk_data +
-                                                 (row * row_len) + col);
-            int byte = *ptr;
-            stream << std::setw(2) << std::setfill('0') << std::hex
-                   << std::uppercase << std::noskipws << byte << ' ';
+            std::uint8_t *byte_ptr = (std::uint8_t *)memory_ptr;
+            int byte = byte_ptr[byte_index];
+
+            if (byte != 0) {
+                stream << std::setw(2) << std::noskipws << std::setfill('0')
+                       << std::hex << std::uppercase << byte << ' ';
+            } else {
+                stream << ".." << ' ';
+            }
         }
         stream << '\n';
     }
-    for (int col = 0; col < (row_len * 3) + 6; col++) {
+    for (int col = 0; col < (columns * 3) + 16; col++) {
         stream << '-';
     }
     stream << '\n';
+}
+
+void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
+    ChunkData *chunk_data = (ChunkData *)chunk_ptr - sizeof(ChunkData);
+
+    stream << "chunk " << "--" << '\n'
+           << "    metadata @ " << chunk_data << '\n'
+           << "        size: " << chunk_data->size << '\n'
+           << "        in use: " << chunk_data->in_use << '\n'
+           << "        next chunk @ " << chunk_data->next << '\n'
+           << "        prev chunk @ " << chunk_data->prev << '\n'
+           << "    memory @ " << chunk_ptr << '\n';
+    print_hex_table(stream, chunk_data, chunk_data->size, sizeof(ChunkData));
 }
 
 void Heap::print_heap(std::ostream &stream) {
