@@ -31,19 +31,22 @@ Heap::Heap() {
     this->head = head;
 }
 
-void *Heap::alloc(uint32_t size) {
-    std::cout << "alloc @ " << this->head + sizeof(ChunkData) << '\n';
+void *Heap::alloc(std::uint32_t size) {
+    void *alloc_ptr = (void *)((std::uintptr_t)this->head + sizeof(ChunkData));
+    std::cout << "alloc @ " << alloc_ptr << '\n';
+    std::cout << "    " << this->head << ", " << sizeof(ChunkData) << '\n';
 
     this->head->in_use = true;
     this->head->size = this->head->size - sizeof(ChunkData);
-    return this->head + sizeof(ChunkData);
+    return alloc_ptr;
 }
 
 void Heap::free(void *chunk_ptr) {
-    ChunkData *chunk_data = (ChunkData *)chunk_ptr - sizeof(ChunkData);
 
-    std::cout << "free @ " << chunk_data << '\n';
+    std::cout << "free @ " << chunk_ptr << '\n';
 
+    ChunkData *chunk_data =
+        (ChunkData *)((std::uintptr_t)chunk_ptr - sizeof(ChunkData));
     chunk_data->in_use = false;
 }
 
@@ -87,7 +90,8 @@ void print_hex_table(std::ostream &stream, void *memory_ptr,
 }
 
 void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
-    ChunkData *chunk_data = (ChunkData *)chunk_ptr - sizeof(ChunkData);
+    ChunkData *chunk_data =
+        (ChunkData *)((std::uintptr_t)chunk_ptr - sizeof(ChunkData));
 
     stream << "chunk " << "--" << '\n'
            << "    metadata @ " << chunk_data << '\n'
@@ -106,7 +110,8 @@ void Heap::print_heap(std::ostream &stream) {
               << "    chunk count: " << "--" << '\n';
 
     // Should traverse through and print all the chunks
-    this->print_chunk(stream, this->head + sizeof(ChunkData));
+    this->print_chunk(stream,
+                      (void *)((std::uintptr_t)this->head + sizeof(ChunkData)));
 }
 
 void Heap::free_heap() {
