@@ -31,7 +31,7 @@ Heap::Heap() {
     this->head = head;
 }
 
-void *Heap::alloc(std::uint32_t size) {
+void *Heap::malloc(std::uint32_t size) {
     void *alloc_ptr = (void *)((std::uintptr_t)this->head + sizeof(ChunkData));
     std::cout << "alloc @ " << alloc_ptr << '\n';
     std::cout << "    " << this->head << ", " << sizeof(ChunkData) << '\n';
@@ -40,6 +40,8 @@ void *Heap::alloc(std::uint32_t size) {
     this->head->size = this->head->size - sizeof(ChunkData);
     return alloc_ptr;
 }
+
+void *Heap::calloc(std::uint32_t size) { return nullptr; }
 
 void Heap::free(void *chunk_ptr) {
 

@@ -18,3 +18,10 @@ Run the example with:
 ```sh
 ./build/Cpp-Heap
 ```
+
+### Todo
+
+- [ ] Split up chunks
+- [ ] Truncate chunks
+- [ ] Coalesce chunks
+- [ ] Free chunks
