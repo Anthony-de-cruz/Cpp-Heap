@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -29,6 +30,8 @@ Heap::Heap() {
     head->prev = head;
 
     this->head = head;
+
+    this->truncate_chunk(head, 100);
 }
 
 void *Heap::malloc(std::uint32_t size) {
@@ -52,9 +55,35 @@ void Heap::free(void *chunk_ptr) {
     chunk_data->in_use = false;
 }
 
-void coalesce_chunk();
+void Heap::truncate_chunk(Heap::ChunkData *chunk, std::uint32_t new_size) {
 
-void truncate_chunk();
+    std::uint32_t metadata_size = sizeof(ChunkData);
+
+    // The new size must be smaller
+    assert(new_size < chunk->size + metadata_size);
+
+    // The chunk must be truncated down to a
+    // multiple of the size of the metadata
+    std::uint32_t truncated_size =
+        new_size + (metadata_size - (new_size % metadata_size));
+    std::uint32_t leftover_space = chunk->size - truncated_size;
+
+    chunk->size = truncated_size;
+
+    // Create a new chunk from the leftovers
+    ChunkData *new_chunk =
+        (ChunkData *)((char *)chunk + chunk->size + metadata_size);
+    *new_chunk = {.size = leftover_space - metadata_size,
+                  .in_use = 0,
+                  .next = chunk->next,
+                  .prev = chunk};
+
+    // Update the new chunk's neighbours
+    chunk->next->prev = new_chunk;
+    chunk->next = new_chunk;
+}
+
+void Heap::coalesce_chunk(Heap::ChunkData *chunk) { assert(false); }
 
 void print_hex_table(std::ostream &stream, void *memory_ptr,
                      std::uint32_t bytes, unsigned int columns) {
@@ -91,13 +120,14 @@ void print_hex_table(std::ostream &stream, void *memory_ptr,
     stream << '\n';
 }
 
-void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
+void Heap::print_chunk(std::ostream &stream, void *chunk_ptr,
+                       unsigned int index) {
     ChunkData *chunk_data =
         (ChunkData *)((std::uintptr_t)chunk_ptr - sizeof(ChunkData));
 
-    stream << "chunk " << "--" << '\n'
+    stream << "chunk " << index << '\n'
            << "    metadata @ " << chunk_data << '\n'
-           << "        size: " << chunk_data->size << '\n'
+           << "        size: " << std::dec << chunk_data->size << '\n'
            << "        in use: " << chunk_data->in_use << '\n'
            << "        next chunk @ " << chunk_data->next << '\n'
            << "        prev chunk @ " << chunk_data->prev << '\n'
@@ -108,12 +138,17 @@ void Heap::print_chunk(std::ostream &stream, void *chunk_ptr) {
 void Heap::print_heap(std::ostream &stream) {
 
     std::cout << "heap " << '\n'
-              << "    chunk metadata size: " << sizeof(ChunkData) << '\n'
-              << "    chunk count: " << "--" << '\n';
+              << "    chunk metadata size: " << sizeof(ChunkData) << '\n';
 
     // Should traverse through and print all the chunks
-    this->print_chunk(stream,
-                      (void *)((std::uintptr_t)this->head + sizeof(ChunkData)));
+    Heap::ChunkData *chunk = this->head;
+    unsigned int index = 0;
+    do {
+        this->print_chunk(
+            stream, (void *)((std::uintptr_t)chunk + sizeof(ChunkData)), index);
+        chunk = chunk->next;
+        index++;
+    } while (chunk != head);
 }
 
 void Heap::free_heap() {

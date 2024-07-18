@@ -17,6 +17,22 @@ class Heap {
     ChunkData *head;
     std::uint32_t available_space;
 
+    /**
+     * Truncate the chunk to the new size,
+     * creating a new chunk with the leftovers.
+     */
+    void truncate_chunk(Heap::ChunkData *free_chunk, std::uint32_t new_size);
+
+    /**
+     * Coalesce chunk with it's free neighbours if there are any.
+     */
+    void coalesce_chunk(Heap::ChunkData *chunk);
+
+    /**
+     * Print memory and metadata of chunk to stream.
+     */
+    void print_chunk(std::ostream &stream, void *chunk, unsigned int index);
+
     void free_heap();
 
   public:
@@ -40,11 +56,6 @@ class Heap {
      * Mark chunk for cleanup.
      */
     void free(void *chunk);
-
-    /**
-     * Print memory and metadata of chunk to stream.
-     */
-    void print_chunk(std::ostream &stream, void *chunk);
 
     /**
      * Print heap metadata and all chunks.
