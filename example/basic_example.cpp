@@ -15,7 +15,7 @@ int main() {
         std::cerr << exception.what() << '\n';
     }
 
-    char *string1 = (char *)heap->alloc(32);
+    char *string1 = (char *)heap->malloc(32);
     std::strcat(string1, "Hi\n");
 
     std::cout << string1;
