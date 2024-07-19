@@ -132,7 +132,8 @@ void Heap::print_chunk(std::ostream &stream, void *chunk_ptr,
            << "        next chunk @ " << chunk_data->next << '\n'
            << "        prev chunk @ " << chunk_data->prev << '\n'
            << "    memory @ " << chunk_ptr << '\n';
-    print_hex_table(stream, chunk_data, chunk_data->size, sizeof(ChunkData));
+    print_hex_table(stream, chunk_data, chunk_data->size + sizeof(ChunkData),
+                    sizeof(ChunkData));
 }
 
 void Heap::print_heap(std::ostream &stream) {
