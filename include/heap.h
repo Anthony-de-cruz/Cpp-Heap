@@ -21,17 +21,19 @@ class Heap {
      * Truncate the chunk to the new size,
      * creating a new chunk with the leftovers.
      */
-    void truncate_chunk(Heap::ChunkData *free_chunk, std::uint32_t new_size);
+    static void truncate_chunk(Heap::ChunkData *free_chunk,
+                               std::uint32_t new_size);
 
     /**
      * Coalesce chunk with it's free neighbours if there are any.
      */
-    void coalesce_chunk(Heap::ChunkData *chunk);
+    static void coalesce_chunk(Heap::ChunkData *chunk);
 
     /**
      * Print memory and metadata of chunk to stream.
      */
-    void print_chunk(std::ostream &stream, void *chunk, unsigned int index);
+    static void print_chunk(std::ostream &stream, void *chunk,
+                            unsigned int index);
 
     void free_heap();
 

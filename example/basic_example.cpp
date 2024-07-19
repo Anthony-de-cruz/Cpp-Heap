@@ -15,7 +15,14 @@ int main() {
         std::cerr << exception.what() << '\n';
     }
 
-    char *string1 = (char *)heap->malloc(32);
+    char *string1;
+    try {
+        string1 = (char *)heap->malloc(3);
+    } catch (std::runtime_error &exception) {
+        std::cerr << exception.what() << '\n';
+    }
+    heap->print_heap(std::cout);
+    std::cout << (void *)string1 << '\n';
     std::strcat(string1, "Hi\n");
 
     std::cout << string1;

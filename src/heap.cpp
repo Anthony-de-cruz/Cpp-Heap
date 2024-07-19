@@ -24,23 +24,31 @@ Heap::Heap() {
     }
 
     ChunkData *head = (ChunkData *)map;
-    head->size = page_size;
-    head->in_use = false;
-    head->next = head;
-    head->prev = head;
+    *head = {.size = page_size - (std::uint32_t)sizeof(ChunkData),
+             .in_use = false,
+             .next = head,
+             .prev = head};
 
     this->head = head;
-
-    this->truncate_chunk(head, 100);
 }
 
 void *Heap::malloc(std::uint32_t size) {
-    void *alloc_ptr = (void *)((std::uintptr_t)this->head + sizeof(ChunkData));
-    std::cout << "alloc @ " << alloc_ptr << '\n';
-    std::cout << "    " << this->head << ", " << sizeof(ChunkData) << '\n';
+    ChunkData *free_chunk = this->head;
+    while (free_chunk->in_use || free_chunk->size <= size) {
 
-    this->head->in_use = true;
-    this->head->size = this->head->size - sizeof(ChunkData);
+        if (free_chunk->next == this->head) {
+            throw std::runtime_error("Allocation failed: out of memory");
+        }
+        free_chunk = free_chunk->next;
+    }
+
+    Heap::truncate_chunk(free_chunk, size);
+    free_chunk->in_use = true;
+
+    auto alloc_ptr = (void *)((std::uintptr_t)free_chunk + sizeof(ChunkData));
+
+    std::cout << "alloc @ " << alloc_ptr << '\n';
+
     return alloc_ptr;
 }
 
