@@ -16,7 +16,7 @@ cmake --build build -j 12
 Run tests with:
 
 ```sh
-GTEST_COLOR=1 ctest --test-dir build --output-on-failure -j12
+GTEST_COLOR=1 ctest --test-dir build --output-on-failure -j 12
 ```
 
 Run the example with:
