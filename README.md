@@ -25,3 +25,4 @@ Run the example with:
 - [x] Truncate chunks
 - [ ] Coalesce chunks
 - [ ] Free chunks
+- [ ] Write tests
