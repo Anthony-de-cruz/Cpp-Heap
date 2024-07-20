@@ -32,3 +32,6 @@ Run the example with:
 - [x] Coalesce chunks
 - [x] Free chunks
 - [ ] Write tests
+
+A rewrite is probably in order as I feel that the code hasn't been written in a way that is particularly testable
+This would also be a good opportunity to implement it using a more sophisticated data structure.
