@@ -27,7 +27,7 @@ class Heap {
     /**
      * Coalesce chunk with it's free neighbours if there are any.
      */
-    static void coalesce_chunk(Heap::ChunkData *chunk);
+    void coalesce_chunk(Heap::ChunkData *chunk);
 
     /**
      * Print memory and metadata of chunk to stream.

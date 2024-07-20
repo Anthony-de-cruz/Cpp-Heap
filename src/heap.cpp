@@ -62,6 +62,8 @@ void Heap::free(void *chunk_ptr) {
     ChunkData *chunk_data =
         (ChunkData *)((std::uintptr_t)chunk_ptr - sizeof(ChunkData));
     chunk_data->in_use = false;
+
+    Heap::coalesce_chunk(chunk_data);
 }
 
 void Heap::truncate_chunk(Heap::ChunkData *chunk, std::uint32_t new_size) {
@@ -92,7 +94,27 @@ void Heap::truncate_chunk(Heap::ChunkData *chunk, std::uint32_t new_size) {
     chunk->next = new_chunk;
 }
 
-void Heap::coalesce_chunk(Heap::ChunkData *chunk) { assert(false); }
+void Heap::coalesce_chunk(Heap::ChunkData *chunk) {
+
+    if (chunk->next == chunk) {
+        assert(chunk->prev == chunk);
+        return;
+    }
+
+    // Check the next chunk and coalesce if not in use
+    if (chunk->next != this->head && !chunk->next->in_use) {
+        chunk->size += chunk->next->size + sizeof(ChunkData);
+        chunk->next->next->prev = chunk;
+        chunk->next = chunk->next->next;
+    }
+
+    // Check the previous chunk and coalesce if not in use
+    if (chunk != this->head && !chunk->prev->in_use) {
+        chunk->prev->size += chunk->size + sizeof(ChunkData);
+        chunk->prev->next = chunk->next;
+        chunk->next->prev = chunk->prev;
+    }
+}
 
 void print_hex_table(std::ostream &stream, void *memory_ptr,
                      std::uint32_t bytes, unsigned int columns) {
@@ -148,7 +170,8 @@ void Heap::print_chunk(std::ostream &stream, void *chunk_ptr,
 void Heap::print_heap(std::ostream &stream) {
 
     std::cout << "heap " << '\n'
-              << "    chunk metadata size: " << sizeof(ChunkData) << '\n';
+              << "    chunk metadata size: " << std::dec << sizeof(ChunkData)
+              << '\n';
 
     // Should traverse through and print all the chunks
     Heap::ChunkData *chunk = this->head;
