@@ -23,6 +23,6 @@ Run the example with:
 
 - [x] Split up chunks
 - [x] Truncate chunks
-- [ ] Coalesce chunks
-- [ ] Free chunks
+- [x] Coalesce chunks
+- [x] Free chunks
 - [ ] Write tests
