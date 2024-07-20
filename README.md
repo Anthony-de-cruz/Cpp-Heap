@@ -21,7 +21,7 @@ Run the example with:
 
 ### Todo
 
-- [ ] Split up chunks
-- [ ] Truncate chunks
+- [x] Split up chunks
+- [x] Truncate chunks
 - [ ] Coalesce chunks
 - [ ] Free chunks

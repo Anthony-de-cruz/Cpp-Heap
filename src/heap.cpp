@@ -33,6 +33,7 @@ Heap::Heap() {
 }
 
 void *Heap::malloc(std::uint32_t size) {
+    // Traverse heap until a free chunk is found, truncate it and return.
     ChunkData *free_chunk = this->head;
     while (free_chunk->in_use || free_chunk->size <= size) {
 
