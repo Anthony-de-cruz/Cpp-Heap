@@ -9,8 +9,14 @@ C++ classes already use memory allocations, meaning that this malloc implementat
 Build with:
 
 ```sh
-cmake -B ./build
-cmake --build ./build
+cmake -B build
+cmake --build build -j 12
+```
+
+Run tests with:
+
+```sh
+GTEST_COLOR=1 ctest --test-dir build --output-on-failure -j12
 ```
 
 Run the example with:
