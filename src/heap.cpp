@@ -13,6 +13,13 @@
 
 #include "heap.h"
 
+struct Heap::ChunkData {
+    std::uint32_t size;
+    bool in_use;
+    ChunkData *next;
+    ChunkData *prev;
+};
+
 Heap::Heap() {
     std::uint32_t page_size = getpagesize();
 

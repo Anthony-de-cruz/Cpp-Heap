@@ -7,15 +7,9 @@
 class Heap {
 
   private:
-    typedef struct ChunkData {
-        std::uint32_t size;
-        bool in_use;
-        ChunkData *next;
-        ChunkData *prev;
-    } ChunkData;
+    struct ChunkData;
 
     ChunkData *head;
-    std::uint32_t available_space;
 
     /**
      * Truncate the chunk to the new size,
