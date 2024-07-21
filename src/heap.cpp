@@ -23,13 +23,11 @@ Heap::Heap() {
         throw std::runtime_error("Memory map retrival failed");
     }
 
-    ChunkData *head = (ChunkData *)map;
+    head = (ChunkData *)map;
     *head = {.size = page_size - (std::uint32_t)sizeof(ChunkData),
              .in_use = false,
              .next = head,
              .prev = head};
-
-    this->head = head;
 }
 
 void *Heap::malloc(std::uint32_t size) {
